@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import HeaderOverlay from "./component/HeaderOverlay";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,10 +25,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased p-4 w-screen h-screen`}
-        id="app-wrapper"
+        className={`${geistSans.variable} ${geistMono.variable} antialiased border-2`}
       >
-        <HeaderOverlay /> {/* client-side draggable header + buttons */}
         {children}
       </body>
     </html>

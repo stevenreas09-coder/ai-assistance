@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased p-4 w-screen h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased p-4 w-screen h-screen bg-white`}
         id="app-wrapper"
       >
         <HeaderOverlay /> {/* client-side draggable header + buttons */}
