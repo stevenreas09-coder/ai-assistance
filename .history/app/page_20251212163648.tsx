@@ -1,0 +1,8 @@
+export default function Home() {
+  return (
+    <div className="bg-white-60 w-full flex h-full">
+      <div className="w-[200] h">capture photo to solve the promblem</div>
+      <div></div>
+    </div>
+  );
+}
