@@ -35,7 +35,7 @@ export default function RootLayout({
           </div>
 
           {/* Scrollable content below header */}
-          <div className="flex-1 overflow-auto bg-white/20 h-full w-full border-black/50 border-2 box-border ">
+          <div className="flex-1 overflow-auto bg-white/20 h-full w-full border-black/20 border-2 box-border ">
             {children}
           </div>
         </div>

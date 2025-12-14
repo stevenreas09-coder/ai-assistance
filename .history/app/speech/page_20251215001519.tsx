@@ -10,7 +10,6 @@ const AUDIO_CONFIG = {
 
 export default function Example() {
   const [transcript, setTranscript] = useState("");
-  const [transcriptFinal, setFinalTranscript] = useState("");
   const [listening, setListening] = useState(false);
   const [connecting, setConnecting] = useState(false);
 
@@ -88,7 +87,6 @@ export default function Example() {
         JSON.stringify({ config: { sample_rate: AUDIO_CONFIG.SAMPLE_RATE } })
       );
       setTranscript("");
-      setFinalTranscript("");
       setListening(true);
       setConnecting(false);
       startStreaming(ws);
@@ -105,7 +103,7 @@ export default function Example() {
           });
         }
         if (data.text) {
-          setFinalTranscript((prev) => prev + data.text + "\n");
+          setTranscript((prev) => prev + data.text + "\n");
         }
       } catch {}
     };
@@ -133,7 +131,7 @@ export default function Example() {
 
   // ⛔ UI BELOW IS 100% UNCHANGED
   return (
-    <div className="flex flex-col px-4 py-1 bg-white/50 text-xs text-black ">
+    <div className="flex flex-col px-4 py-1 text-xs text-black ">
       {/* Top controls */}
       <div className="flex items-center gap-2">
         <h1>Filter</h1>
@@ -145,20 +143,15 @@ export default function Example() {
       {/* Main content */}
       <div className="flex flex-col gap-2 min-h-0">
         {/* AI response box */}
-        <div className="w-full h-[200px] border border-black/30 font-semibold bg-white/20 p-2">
+        <div className="w-full h-[200px] border font-semibold bg-violet-500/20 p-2">
           AI response
         </div>
 
-        <div className="w-full h-px bg-black/50"></div>
+        <div className="w-full h-px bg-black"></div>
 
         {/* Transcript box (scrollable) */}
-        <div className="w-full border border-black/30 font-semibold bg-white/20 h-[150px]">
-          <div className="h-[30%]  w-full divide-x-2 p-2 bg-white/50 border overflow-hidden">
-            {transcript}
-          </div>
-          <div className="h-[70%] w-full p-1 overflow-y-auto bg-white/20 border-black/30 border-t ">
-            {transcriptFinal}
-          </div>
+        <div className="w-full border font-semibold bg-amber-500/20 p-2 overflow-y-auto whitespace-pre-wrap h-100 max-h-[150px] min-h-[80px]">
+          {transcript}
         </div>
       </div>
 
@@ -166,8 +159,8 @@ export default function Example() {
       <div className="flex justify-between text-xs p-1 text-white font-semibold">
         <button
           onClick={toggleListening}
-          className={`rounded-full border py-2 px-6 ${
-            listening ? "bg-red-500" : "bg-amber-500/70"
+          className={`rounded-full py-2 px-6 ${
+            listening ? "bg-red-500" : "bg-amber-500"
           } ${connecting ? "opacity-60 cursor-not-allowed" : ""}`}
           disabled={connecting}
         >
@@ -178,22 +171,22 @@ export default function Example() {
             : "Start Listening"}
         </button>
 
-        <button className="rounded-full border bg-violet-700/70 py-2 px-6">
+        <button className="rounded-full bg-violet-700 py-2 px-6">
           Send to AI
         </button>
       </div>
 
       {/* Shortcut keys */}
       <div className="flex justify-between text-white w-full mt-1">
-        <span className="bg-black/50 rounded-2xl px-3 text-xs">
+        <span className="bg-black rounded-2xl px-3 text-xs">
           Shortcut key{" "}
-          <span className="bg-black/50 border px-2 rounded-2xl">
+          <span className="bg-gray-500 px-2 rounded-2xl">
             Ctrl + Arrow Left
           </span>
         </span>
-        <span className="bg-black/50 rounded-2xl px-3 text-xs">
+        <span className="bg-black rounded-2xl px-3 text-xs">
           Shortcut key{" "}
-          <span className="bg-black/50 border px-2 rounded-2xl">
+          <span className="bg-gray-500 px-2 rounded-2xl">
             Ctrl + Arrow Right
           </span>
         </span>

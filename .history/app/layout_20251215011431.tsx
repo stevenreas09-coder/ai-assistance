@@ -28,14 +28,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-[520px]`}
       >
-        <div className="bg-white/50 rounded p-2 relative flex flex-col h-full">
+        <div className="bg-black/60 rounded p-2 relative flex flex-col h-full">
           {/* Sticky header */}
           <div className="sticky top-0 z-50">
             <HeaderOverlay />
           </div>
 
           {/* Scrollable content below header */}
-          <div className="flex-1 overflow-auto bg-white/20 h-full w-full border-black/50 border-2 box-border ">
+          <div className="flex-1 overflow-auto bg-white/50 h-full w-full border-black border-2 box-border ">
             {children}
           </div>
         </div>

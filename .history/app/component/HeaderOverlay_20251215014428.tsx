@@ -46,7 +46,7 @@ export default function HeaderOverlay() {
           onClick={handleClose}
           className="flex items-center hover:text-amber-500 justify-center"
         >
-          <IoMdExit className="w-5 h-5 hover:text-red-500" />
+          <IoMdExit className="w-5 h-5 text-red-500" />
         </button>
       </div>
     </div>

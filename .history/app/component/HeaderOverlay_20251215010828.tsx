@@ -18,7 +18,7 @@ export default function HeaderOverlay() {
 
   return (
     <div
-      className="w-full sticky h-6 flex items-center text-black font-normal justify-between p-2 pb-4 text-sm"
+      className="w-full sticky h-6 flex items-center text-white font-normal justify-between p-2 pb-4 text-sm"
       style={{ WebkitAppRegion: draggable ? "drag" : "no-drag" } as any}
     >
       <Link href="/">
@@ -36,7 +36,7 @@ export default function HeaderOverlay() {
           onClick={toggleDraggable}
         >
           {draggable ? (
-            <RiDragMove2Fill className="w-4 h-4 text-black" />
+            <RiDragMove2Fill className="w-4 h-4" />
           ) : (
             <ImBlocked className="w-4 h-4" />
           )}
@@ -46,7 +46,7 @@ export default function HeaderOverlay() {
           onClick={handleClose}
           className="flex items-center hover:text-amber-500 justify-center"
         >
-          <IoMdExit className="w-5 h-5 hover:text-red-500" />
+          <IoMdExit className="w-5 h-5" />
         </button>
       </div>
     </div>

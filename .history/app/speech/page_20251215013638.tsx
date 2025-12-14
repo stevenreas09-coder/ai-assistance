@@ -145,7 +145,7 @@ export default function Example() {
       {/* Main content */}
       <div className="flex flex-col gap-2 min-h-0">
         {/* AI response box */}
-        <div className="w-full h-[200px] border border-black/30 font-semibold bg-white/20 p-2">
+        <div className="w-full h-[200px] border font-semibold bg-white/20 p-2">
           AI response
         </div>
 
