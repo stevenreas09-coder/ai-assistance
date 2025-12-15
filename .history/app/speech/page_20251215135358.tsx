@@ -21,10 +21,14 @@ export default function Example() {
 
   const startStreaming = async (ws: WebSocket) => {
     try {
-      // 🎧 Capture TAB audio ONLY
-      const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: false,
-        audio: true, // main.js handler provides loopback
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          channelCount: AUDIO_CONFIG.CHANNELS,
+          sampleRate: AUDIO_CONFIG.SAMPLE_RATE,
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+        },
       });
 
       mediaStreamRef.current = stream;
@@ -49,11 +53,8 @@ export default function Example() {
       };
 
       source.connect(workletNode);
-
-      // ❌ DO NOT connect to destination (no playback)
-      // workletNode.connect(audioContext.destination);
+      workletNode.connect(audioContext.destination);
     } catch (err) {
-      console.error("Tab audio capture failed:", err);
       ws.close();
     }
   };
@@ -123,7 +124,6 @@ export default function Example() {
       wsRef.current = null;
       setListening(false);
       setConnecting(false);
-      setTranscript("");
     };
   };
 

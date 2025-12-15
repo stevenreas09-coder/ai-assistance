@@ -1,10 +1,4 @@
-const {
-  app,
-  BrowserWindow,
-  ipcMain,
-  desktopCapturer,
-  session,
-} = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const { spawn } = require("child_process");
 const net = require("net");

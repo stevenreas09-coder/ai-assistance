@@ -19,6 +19,10 @@ export default function Example() {
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const workletNodeRef = useRef<AudioWorkletNode | null>(null);
 
+  useEffect(() => {
+    console.log(transcriptFinal);
+  }, [transcriptFinal]);
+
   const startStreaming = async (ws: WebSocket) => {
     try {
       // 🎧 Capture TAB audio ONLY

@@ -24,7 +24,7 @@ export default function Example() {
       // 🎧 Capture TAB audio ONLY
       const stream = await navigator.mediaDevices.getDisplayMedia({
         video: false,
-        audio: true, // main.js handler provides loopback
+        audio: true,
       });
 
       mediaStreamRef.current = stream;
