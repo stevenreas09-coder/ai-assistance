@@ -1,5 +1,8 @@
 "use client";
+
 import { useState, useRef, useEffect } from "react";
+import { IoFilter } from "react-icons/io5";
+
 const AUDIO_CONFIG = {
   SAMPLE_RATE: 16000,
   CHANNELS: 1,
@@ -19,10 +22,7 @@ export default function Example() {
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
   const [model, setModel] = useState<string | null>("");
-
-  const [selectedOption, setSelectedOption] = useState(
-    "Answer this interview question directly in one or two paragraphs."
-  );
+  const [selectedOption, setSelectedOption] = useState("");
 
   //------------------------------------------------------------------------------------------
   async function handleSend() {
@@ -31,12 +31,10 @@ export default function Example() {
     setOutput("");
     setLoading(true);
 
-    const finalMessage = `${selectedOption} ${transcriptFinal}?`;
-
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: finalMessage }),
+      body: JSON.stringify({ message: transcriptFinal }),
     });
     const modelUsed = res.headers.get("X-Model-Used");
     setModel(modelUsed); // render in UI
@@ -189,13 +187,11 @@ export default function Example() {
                 value={selectedOption}
                 onChange={(e) => setSelectedOption(e.target.value)}
               >
-                <option value="Answer this interview question directly in two or three paragraphs.">
+                <option value="this is an interview question and you answer in three or two paragraphg">
                   interview
                 </option>
-                <option value="this is junior web and software developer.can you Answer this interview question directly in one paragraph.">
-                  Coding
-                </option>
-                <option value="translate">others</option>
+                <option value="explain">Example</option>
+                <option value="translate">Coding</option>
               </select>
             </div>
           </div>

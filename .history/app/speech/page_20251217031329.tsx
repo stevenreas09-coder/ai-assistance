@@ -1,5 +1,8 @@
 "use client";
+
 import { useState, useRef, useEffect } from "react";
+import { IoFilter } from "react-icons/io5";
+
 const AUDIO_CONFIG = {
   SAMPLE_RATE: 16000,
   CHANNELS: 1,
@@ -18,12 +21,6 @@ export default function Example() {
 
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [model, setModel] = useState<string | null>("");
-
-  const [selectedOption, setSelectedOption] = useState(
-    "Answer this interview question directly in one or two paragraphs."
-  );
-
   //------------------------------------------------------------------------------------------
   async function handleSend() {
     if (!transcriptFinal.trim()) return;
@@ -31,15 +28,11 @@ export default function Example() {
     setOutput("");
     setLoading(true);
 
-    const finalMessage = `${selectedOption} ${transcriptFinal}?`;
-
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: finalMessage }),
+      body: JSON.stringify({ message: transcriptFinal }),
     });
-    const modelUsed = res.headers.get("X-Model-Used");
-    setModel(modelUsed); // render in UI
 
     const reader = res.body!.getReader();
     const decoder = new TextDecoder();
@@ -180,33 +173,11 @@ export default function Example() {
   return (
     <div className="flex flex-col px-4 py-1 bg-white/50 text-xs text-black ">
       {/* Top controls */}
-      <div className=" flex flex-row justify-between items-center gap-2">
-        <div className="flex gap-2">
-          <div>
-            <div className="flex gap-2">
-              <select
-                className="p-0.5 bg-white/50"
-                value={selectedOption}
-                onChange={(e) => setSelectedOption(e.target.value)}
-              >
-                <option value="Answer this interview question directly in two or three paragraphs.">
-                  interview
-                </option>
-                <option value="this is junior web and software developer.can you Answer this interview question directly in one paragraph.">
-                  Coding
-                </option>
-                <option value="translate">others</option>
-              </select>
-            </div>
-          </div>
-          <div className="w-1 h-4 border-r-2 border-black"></div>
-          <h1>Upload resume</h1>
-        </div>
-        <div>
-          {model && model.length > 0
-            ? `Platform provider: ${model}`
-            : "AI platform"}
-        </div>
+      <div className="flex items-center gap-2">
+        <h1>Filter</h1>
+        <IoFilter />
+        <div className="w-1 h-4 border-r-2 border-black"></div>
+        <h1>Upload resume</h1>
       </div>
 
       {/* Main content */}
@@ -233,7 +204,7 @@ export default function Example() {
       <div className="flex justify-between text-xs p-1 text-white font-semibold">
         <button
           onClick={toggleListening}
-          className={`rounded-full border hover:bg-white/50 py-2 px-6 ${
+          className={`rounded-full border hover:bg-slate-400 py-2 px-6 ${
             listening ? "bg-red-500" : "bg-amber-500/70"
           } ${connecting ? "opacity-60 cursor-not-allowed" : ""}`}
           disabled={connecting}
@@ -253,7 +224,7 @@ export default function Example() {
         </button>
 
         <button
-          className="rounded-full hover:bg-white/50 border bg-violet-700/70 py-2 px-6"
+          className="rounded-full hover:bg-slate-400 border bg-violet-700/70 py-2 px-6"
           onClick={handleSend}
           disabled={loading}
         >

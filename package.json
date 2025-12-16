@@ -10,6 +10,7 @@
     "start": "cross-env NODE_ENV=production electron electron/main.js"
   },
   "dependencies": {
+    "@openrouter/sdk": "^0.2.11",
     "autoprefixer": "^10.4.22",
     "next": "16.0.8",
     "postcss": "^8.5.6",

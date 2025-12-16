@@ -21,7 +21,7 @@ export default function Example() {
   const [model, setModel] = useState<string | null>("");
 
   const [selectedOption, setSelectedOption] = useState(
-    "Answer this interview question directly in one or two paragraphs."
+    "Answer this interview question directly in two or three paragraphs."
   );
 
   //------------------------------------------------------------------------------------------
@@ -192,10 +192,8 @@ export default function Example() {
                 <option value="Answer this interview question directly in two or three paragraphs.">
                   interview
                 </option>
-                <option value="this is junior web and software developer.can you Answer this interview question directly in one paragraph.">
-                  Coding
-                </option>
-                <option value="translate">others</option>
+                <option value="explain">Example</option>
+                <option value="translate">Coding</option>
               </select>
             </div>
           </div>

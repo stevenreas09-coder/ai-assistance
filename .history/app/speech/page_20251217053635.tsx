@@ -192,7 +192,7 @@ export default function Example() {
                 <option value="Answer this interview question directly in two or three paragraphs.">
                   interview
                 </option>
-                <option value="this is junior web and software developer.can you Answer this interview question directly in one paragraph.">
+                <option value="web and software developer.can you Answer this interview question directly for me.">
                   Coding
                 </option>
                 <option value="translate">others</option>
