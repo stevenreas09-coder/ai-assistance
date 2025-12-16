@@ -108,6 +108,7 @@ export default function Example() {
 
           // IMPORTANT: clear partial when final arrives
           setTranscript("");
+          console.log(transcriptFinal);
         }
       } catch {}
     };

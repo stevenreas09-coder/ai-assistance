@@ -19,6 +19,8 @@ export default function Example() {
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const workletNodeRef = useRef<AudioWorkletNode | null>(null);
 
+  console.log(transcriptFinal);
+
   const startStreaming = async (ws: WebSocket) => {
     try {
       // 🎧 Capture TAB audio ONLY
@@ -137,7 +139,7 @@ export default function Example() {
   const clearMessage = () => {
     setFinalTranscript("");
     setTranscript("");
-    console.log(`final text clear ${transcriptFinal}`);
+    console.log(transcriptFinal);
   };
 
   // ⛔ UI BELOW IS 100% UNCHANGED

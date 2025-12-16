@@ -137,7 +137,6 @@ export default function Example() {
   const clearMessage = () => {
     setFinalTranscript("");
     setTranscript("");
-    console.log(`final text clear ${transcriptFinal}`);
   };
 
   // ⛔ UI BELOW IS 100% UNCHANGED

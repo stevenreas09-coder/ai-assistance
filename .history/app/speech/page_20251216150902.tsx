@@ -134,10 +134,11 @@ export default function Example() {
     };
   }, []);
 
+  console.log(transcriptFinal);
   const clearMessage = () => {
     setFinalTranscript("");
     setTranscript("");
-    console.log(`final text clear ${transcriptFinal}`);
+    console.log(transcriptFinal);
   };
 
   // ⛔ UI BELOW IS 100% UNCHANGED

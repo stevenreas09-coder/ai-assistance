@@ -101,6 +101,7 @@ export default function Example() {
           setTranscript(data.partial);
         }
         if (data.text) {
+          console.log(transcriptFinal);
           // final = append to history
           setFinalTranscript((prev) =>
             prev ? prev + "\n" + data.text : data.text

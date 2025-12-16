@@ -108,6 +108,7 @@ export default function Example() {
 
           // IMPORTANT: clear partial when final arrives
           setTranscript("");
+          console.log(transcriptFinal);
         }
       } catch {}
     };
@@ -137,7 +138,7 @@ export default function Example() {
   const clearMessage = () => {
     setFinalTranscript("");
     setTranscript("");
-    console.log(`final text clear ${transcriptFinal}`);
+    console.log(transcriptFinal);
   };
 
   // ⛔ UI BELOW IS 100% UNCHANGED

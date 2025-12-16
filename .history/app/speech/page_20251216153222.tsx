@@ -134,6 +134,12 @@ export default function Example() {
     };
   }, []);
 
+  useEffect(() => {
+    if (transcriptFinal?.length === 0) {
+      console.log(`text show ${transcriptFinal}`);
+    }
+  }, [transcriptFinal]);
+
   const clearMessage = () => {
     setFinalTranscript("");
     setTranscript("");

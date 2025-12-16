@@ -137,7 +137,6 @@ export default function Example() {
   const clearMessage = () => {
     setFinalTranscript("");
     setTranscript("");
-    console.log(`final text clear ${transcriptFinal}`);
   };
 
   // ⛔ UI BELOW IS 100% UNCHANGED
@@ -187,10 +186,7 @@ export default function Example() {
             : "Start Listening"}
         </button>
 
-        <button
-          onClick={clearMessage}
-          className="rounded-full border bg-yellow-700/70 py-2 px-6"
-        >
+        <button className="rounded-full border bg-yellow-700/70 py-2 px-6">
           Clear Text
         </button>
 
