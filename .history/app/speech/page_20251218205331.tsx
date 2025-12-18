@@ -1,0 +1,283 @@
+"use client";
+import "./globals.css";
+import { useState, useRef, useEffect } from "react";
+const AUDIO_CONFIG = {
+  SAMPLE_RATE: 16000,
+  CHANNELS: 1,
+};
+
+export default function Example() {
+  const [transcript, setTranscript] = useState("");
+  const [transcriptFinal, setFinalTranscript] = useState("");
+  const [listening, setListening] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+
+  const wsRef = useRef<WebSocket | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const workletNodeRef = useRef<AudioWorkletNode | null>(null);
+
+  const [output, setOutput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [model, setModel] = useState<string | null>("");
+
+  const [selectedOption, setSelectedOption] = useState(
+    "Answer this interview question directly in one or two paragraphs."
+  );
+
+  //------------------------------------------------------------------------------------------
+  async function handleSend() {
+    if (!transcriptFinal.trim()) return;
+
+    setOutput("");
+    setLoading(true);
+
+    const finalMessage = `${selectedOption} ${transcriptFinal}?`;
+
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: finalMessage }),
+    });
+    const modelUsed = res.headers.get("X-Model-Used");
+    setModel(modelUsed); // render in UI
+
+    const reader = res.body!.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      setOutput((prev) => prev + chunk);
+    }
+
+    setLoading(false);
+  }
+  // ----------------------------------------------------------------------------------
+  const startStreaming = async (ws: WebSocket) => {
+    try {
+      // 🎧 Capture TAB audio ONLY
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: false,
+        audio: true, // main.js handler provides loopback
+      });
+
+      mediaStreamRef.current = stream;
+
+      const audioContext = new AudioContext({
+        sampleRate: AUDIO_CONFIG.SAMPLE_RATE,
+      });
+      audioContextRef.current = audioContext;
+
+      await audioContext.audioWorklet.addModule(
+        "/audio-worklet/pcm-processor.js"
+      );
+
+      const source = audioContext.createMediaStreamSource(stream);
+      const workletNode = new AudioWorkletNode(audioContext, "pcm-processor");
+      workletNodeRef.current = workletNode;
+
+      workletNode.port.onmessage = (e) => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(e.data);
+        }
+      };
+
+      source.connect(workletNode);
+
+      // ❌ DO NOT connect to destination (no playback)
+      // workletNode.connect(audioContext.destination);
+    } catch (err) {
+      console.error("Tab audio capture failed:", err);
+      ws.close();
+    }
+  };
+  //-----------------------------------------------------------------------------------
+  const stopStreaming = () => {
+    workletNodeRef.current?.disconnect();
+    workletNodeRef.current = null;
+
+    audioContextRef.current?.close();
+    audioContextRef.current = null;
+
+    mediaStreamRef.current?.getTracks().forEach((t) => t.stop());
+    mediaStreamRef.current = null;
+  };
+  //----------------------------------------------------------------------------------
+  const toggleListening = () => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      setListening(false);
+      wsRef.current.close();
+      stopStreaming();
+      return;
+    }
+
+    setConnecting(true);
+    const ws = new WebSocket("ws://127.0.0.1:8765");
+    ws.binaryType = "arraybuffer";
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      ws.send(
+        JSON.stringify({ config: { sample_rate: AUDIO_CONFIG.SAMPLE_RATE } })
+      );
+      setTranscript("");
+      setFinalTranscript("");
+      setListening(true);
+      setConnecting(false);
+      startStreaming(ws);
+    };
+
+    ws.onmessage = (event: MessageEvent) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.partial !== undefined) {
+          // partial = single live line
+          setTranscript(data.partial);
+        }
+        if (data.text) {
+          // final = append to history
+          setFinalTranscript((prev) =>
+            prev ? prev + "\n" + data.text : data.text
+          );
+
+          // IMPORTANT: clear partial when final arrives
+          setTranscript("");
+        }
+      } catch {}
+    };
+
+    ws.onerror = () => {
+      setListening(false);
+      setConnecting(false);
+      ws.close();
+    };
+
+    ws.onclose = () => {
+      stopStreaming();
+      wsRef.current = null;
+      setListening(false);
+      setConnecting(false);
+      setTranscript("");
+    };
+  };
+  //----------------------------------------------------------------------------------------
+  useEffect(() => {
+    return () => {
+      wsRef.current?.close();
+      stopStreaming();
+    };
+  }, []);
+  //-------------------------------------------------------------------------------------
+  const clearMessage = () => {
+    setFinalTranscript("");
+    setTranscript("");
+    console.log(`final text clear ${transcriptFinal}`);
+  };
+
+  // ⛔ UI BELOW IS 100% UNCHANGED
+  return (
+    <div className="flex flex-col h-full px-4 py-2 bg-black/5 text-xs text-white">
+      {/* 1. Header Controls - Explicitly no-drag if needed */}
+      <div className="flex flex-row justify-between items-center gap-2 mb-2">
+        <div className="flex gap-2">
+          <select
+            className="bg-zinc-800 text-white rounded border border-white/10 px-1 py-0.5 outline-none focus:border-amber-500"
+            value={selectedOption}
+            onChange={(e) => setSelectedOption(e.target.value)}
+          >
+            <option value="interview">Interview</option>
+            <option value="coding">Coding</option>
+            <option value="translate">Others</option>
+          </select>
+          <button className="bg-white/10 hover:bg-white/20 border border-white/10 rounded px-2 transition-colors">
+            Upload Resume
+          </button>
+        </div>
+        <div className="px-2 py-0.5 bg-black/40 rounded-full text-[10px] text-zinc-400">
+          {model || "AI Platform"}
+        </div>
+      </div>
+
+      {/* 2. Main content area (Scrollable) */}
+      <div className="flex flex-col gap-2 flex-1 min-h-0">
+        {/* AI response box */}
+        <div className="flex-1 rounded-xl border border-white/10 overflow-y-auto whitespace-pre-wrap font-medium bg-zinc-900/80 p-3 shadow-inner custom-scrollbar">
+          {output || (
+            <span className="text-zinc-500 italic">
+              AI response will appear here...
+            </span>
+          )}
+        </div>
+
+        {/* Transcript Area */}
+        <div className="h-[140px] flex flex-col rounded-xl border border-white/10 overflow-hidden bg-zinc-900/50">
+          {/* Live Interim Results */}
+          <div className="h-10 w-full p-2 bg-white/5 italic text-zinc-400 overflow-hidden text-[11px] border-b border-white/5">
+            {transcript || "Listening..."}
+          </div>
+          {/* Final Results */}
+          <div className="flex-1 w-full p-2 overflow-y-auto text-amber-100/90 custom-scrollbar">
+            {transcriptFinal}
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Action Buttons */}
+      <div className="flex justify-between items-center gap-2 py-3">
+        <button
+          onClick={toggleListening}
+          className={`flex-1 rounded-lg border border-white/10 transition-all active:scale-95 py-2.5 font-bold ${
+            listening
+              ? "bg-red-600 animate-pulse"
+              : "bg-amber-600 hover:bg-amber-500"
+          } ${connecting ? "opacity-50 cursor-not-allowed" : ""}`}
+          disabled={connecting}
+        >
+          {connecting ? "Connecting..." : listening ? "Stop" : "Record"}
+        </button>
+
+        <button
+          onClick={clearMessage}
+          className="px-4 py-2.5 rounded-lg border border-white/10 bg-zinc-800 hover:bg-zinc-700 active:scale-95 transition-all"
+        >
+          Clear
+        </button>
+
+        <button
+          className="flex-1 rounded-lg border border-white/10 bg-violet-700 hover:bg-violet-600 active:scale-95 py-2.5 font-bold transition-all disabled:opacity-50"
+          onClick={handleSend}
+          disabled={loading}
+        >
+          {loading ? "Thinking..." : "Send AI"}
+        </button>
+      </div>
+
+      {/* 4. Shortcuts Footer */}
+      <div className="flex justify-between text-[10px] text-zinc-500 pb-1">
+        <div className="flex gap-1 items-center">
+          <kbd className="bg-zinc-800 border border-zinc-700 px-1 rounded text-zinc-300">
+            Ctrl
+          </kbd>{" "}
+          +
+          <kbd className="bg-zinc-800 border border-zinc-700 px-1 rounded text-zinc-300">
+            ←
+          </kbd>
+          <span>Record</span>
+        </div>
+        <div className="flex gap-1 items-center">
+          <kbd className="bg-zinc-800 border border-zinc-700 px-1 rounded text-zinc-300">
+            Ctrl
+          </kbd>{" "}
+          +
+          <kbd className="bg-zinc-800 border border-zinc-700 px-1 rounded text-zinc-300">
+            →
+          </kbd>
+          <span>Send</span>
+        </div>
+      </div>
+    </div>
+  );
+}
